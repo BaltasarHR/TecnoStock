@@ -27,11 +27,18 @@ input,select{background:var(--card);border:1px solid var(--bd);border-radius:8px
 .m{margin:6px 0;padding:7px 10px;border-radius:10px;max-width:85%}.u{background:var(--ac);color:#fff;margin-left:auto}.a{background:var(--card);border:1px solid var(--bd)}
 .msg{margin:8px 0;font-weight:600}
 input[type=checkbox]{padding:0;width:16px;height:16px;vertical-align:middle}
+#who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hero{background:linear-gradient(135deg,var(--ac),#7a4df0);color:#fff;border-radius:14px;padding:28px 22px;margin-bottom:14px}.hero h2{margin:0 0 6px;font-size:26px}.hero p{margin:0 0 14px;opacity:.92}.hero button{background:#fff;color:#2f4fb0;margin:0 8px 6px 0}.hero button.g{background:transparent;color:#fff;border:1px solid #fff}
+.ico{font-size:40px;text-align:center;background:var(--ac2);border-radius:8px;padding:10px;margin-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.chip{background:var(--card);color:var(--tx);border:1px solid var(--bd);padding:5px 12px;border-radius:99px}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+#toast{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));max-width:320px;padding:10px 14px;border-radius:10px;color:#fff;box-shadow:0 4px 14px #0004;display:none;z-index:50}
+.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}.modal .card{width:100%;max-width:340px;margin:0}
+footer{text-align:center;color:var(--mu);font-size:13px;padding:20px 16px}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}.side{position:sticky;top:8px}
 @media(max-width:800px){.cols{grid-template-columns:1fr}.side{position:static}}
 </style></head><body>
-<header><h1>🖥️ TecnoStock</h1><div id="who"></div></header>
-<main><nav id="nav"></nav><div id="msg" class="msg" role="status"></div><div id="view"></div></main>
+<header><h1>🖥️ Tecno<span style="color:var(--ac)">Stock</span></h1><div id="who"></div></header>
+<main><nav id="nav"></nav><div id="toast" role="status"></div><div id="view"></div></main><footer>TecnoStock · Proyecto final – Taller Integrador · Tecnicatura Universitaria en Informática, UNNE</footer>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -60,20 +67,23 @@ const seed=()=>({deps:['Central','Sucursal'],prods:[
 let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!S||!S.prods)S=seed();S.clients=S.clients||[];
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const tot=p=>Object.values(p.st).reduce((a,b)=>a+b,0);
-let ccart=[],pend=null,hideOut=false,user=null,tab='cat',cart=[],t0=0,hist=[{a:1,t:'Hola, soy el asistente de TecnoStock. Preguntame por precios, stock o categorías.'}],q='';
+let fc='',so='',ccart=[],pend=null,hideOut=false,user=null,tab='cat',cart=[],t0=0,hist=[{a:1,t:'Hola, soy el asistente de TecnoStock. Preguntame por precios, stock o categorías.'}],q='';
 const USERS={vendedor:{pw:'1234',role:'Vendedor'},admin:{pw:'1234',role:'Administrador'}};
-const flash=(t,ok)=>{const m=$('#msg');m.textContent=t;m.className='msg '+(ok?'ok':'er')};
+let tt;const flash=(t,ok)=>{const m=$('#toast');clearTimeout(tt);if(!t){m.style.display='none';return}m.textContent=t;m.style.background=ok?'#1a8a4a':'#c62828';m.style.display='block';tt=setTimeout(()=>m.style.display='none',4500)};
+const IC={Notebooks:'💻',Monitores:'🖥️',Periféricos:'🖱️',Almacenamiento:'💾',Componentes:'🧩',Impresoras:'🖨️'};
 
 function head(){
- $('#who').innerHTML=user?`<span class="mu">${esc(user.name?user.name+' · ':'')}${esc(user.role)}</span> <button class="s" id="lo">Salir</button>`:
- `<form id="lf" class="row" style="margin:0"><input name="u" placeholder="usuario o email" size="12" autocomplete="username"><input name="p" type="password" placeholder="clave" size="7" autocomplete="current-password"><button>Ingresar</button><button type="button" class="s" id="rg">Crear cuenta</button></form>`;
- if(!user)$('#rg').onclick=()=>{tab='reg';flash('');render()};
+ const cb=(!user||user.role==='Cliente')?`<button class="s" id="hc">🛒 ${ccart.reduce((a,c)=>a+c.qty,0)}</button> `:'';
+ $('#who').innerHTML=cb+(user?`<span class="mu">${esc(user.name?user.name+' · ':'')}${esc(user.role)}</span> <button class="s" id="lo">Salir</button>`:
+ `<button id="li">Ingresar</button> <button class="s" id="rg">Crear cuenta</button>`);
+ if(!user){$('#rg').onclick=()=>{tab='reg';flash('');render()};$('#li').onclick=openLogin}
+ if($('#hc'))$('#hc').onclick=()=>{if(!user)return openLogin();tab='cart';render()};
  if(user)$('#lo').onclick=()=>{user=null;tab='cat';cart=[];ccart=[];flash('');render()};
- else $('#lf').onsubmit=e=>{e.preventDefault();const f=e.target,k=f.u.value.trim().toLowerCase(),cl=S.clients.find(c=>c.email===k),u=USERS[k]||(cl&&{pw:cl.pw,role:'Cliente',name:cl.name,email:cl.email});
+ else window.doLogin=e=>{e.preventDefault();const f=e.target,k=f.u.value.trim().toLowerCase(),cl=S.clients.find(c=>c.email===k),u=USERS[k]||(cl&&{pw:cl.pw,role:'Cliente',name:cl.name,email:cl.email});
   if(u&&u.pw===f.p.value){user=u;tab=u.role==='Vendedor'?'sale':u.role==='Cliente'?'cat':'prod';flash('Sesión iniciada como '+u.role,1)}
   else flash('Usuario o clave incorrectos (demo: vendedor/1234 o admin/1234).');render()};
 }
-function nav(){
+function nav(){const h=document.getElementById('hc');if(h)h.textContent='🛒 '+ccart.reduce((a,c)=>a+c.qty,0);
  const t=[['cat','Catálogo']];
  if(user&&user.role!=='Cliente')t.push(['sale','Registrar venta']);
  if(user&&user.role==='Cliente')t.push(['cart','Carrito ('+ccart.reduce((a,c)=>a+c.qty,0)+')'],['mis','Mis compras']);
@@ -84,12 +94,13 @@ function nav(){
 const badge=p=>{const n=tot(p);return n===0?'<span class="er">Sin stock</span>':n<LOW?`<span class="wa">Últimas ${n} unidades</span>`:`<span class="ok">Disponible (${n})</span>`};
 
 function vCat(){
- const l=S.prods.filter(p=>(p.name+' '+p.cat).toLowerCase().includes(q.toLowerCase())&&(!hideOut||tot(p)>0));
- $('#view').innerHTML=`<div class="cols"><div class="card"><div class="row"><input id="q" placeholder="Buscar producto o categoría" value="${esc(q)}" style="flex:1;min-width:180px"><label class="mu"><input type="checkbox" id="ho" ${hideOut?'checked':''}> Ocultar sin stock</label></div>
- <div class="grid">${l.map(p=>`<div class="p"><span class="tag">${esc(p.cat)}</span><b style="margin-top:6px">${esc(p.name)}</b><div class="pr">${money(p.price)}</div>${badge(p)}${(!user||user.role==='Cliente')&&tot(p)>0?`<div style="margin-top:8px"><button class="s" data-add="${p.id}">Agregar al carrito</button></div>`:''}</div>`).join('')||'<p class="mu">No hay productos que coincidan con la búsqueda.</p>'}</div></div>
+ const l=S.prods.filter(p=>(p.name+' '+p.cat).toLowerCase().includes(q.toLowerCase())&&(!hideOut||tot(p)>0)&&(!fc||p.cat===fc));if(so==='a')l.sort((x,y)=>x.price-y.price);if(so==='d')l.sort((x,y)=>y.price-x.price);
+ $('#view').innerHTML=(user?'':`<div class="hero"><h2>Tecnología para tu trabajo y tu casa</h2><p>Notebooks, monitores, periféricos y más, con stock actualizado.</p><button id="hv">Ver catálogo</button><button class="g" id="hr">Crear cuenta</button></div>`)+`<div class="cols"><div class="card" id="cat0"><div class="row"><input id="q" placeholder="Buscar producto o categoría" value="${esc(q)}" style="flex:1;min-width:180px"><label class="mu"><input type="checkbox" id="ho" ${hideOut?'checked':''}> Ocultar sin stock</label><select id="so"><option value="">Ordenar</option><option value="a"${so==='a'?' selected':''}>Menor precio</option><option value="d"${so==='d'?' selected':''}>Mayor precio</option></select></div><div class="chips">${['',...new Set(S.prods.map(p=>p.cat))].map(c=>`<button class="chip${fc===c?' on':''}" data-fc="${esc(c)}">${c?esc(c):'Todas'}</button>`).join('')}</div>
+ <div class="grid">${l.map(p=>`<div class="p"><div class="ico">${IC[p.cat]||'📦'}</div><span class="tag">${esc(p.cat)}</span><b style="margin-top:6px">${esc(p.name)}</b><div class="pr">${money(p.price)}</div>${badge(p)}${(!user||user.role==='Cliente')&&tot(p)>0?`<div style="margin-top:8px"><button class="s" data-add="${p.id}">Agregar al carrito</button></div>`:''}</div>`).join('')||'<p class="mu">No hay productos que coincidan con la búsqueda.</p>'}</div></div>
  <aside class="card side"><b>Asistente virtual</b><div id="chat">${hist.map(h=>`<div class="m ${h.a?'a':'u'}">${esc(h.t)}</div>`).join('')}</div>
  <form id="cf" class="row" style="margin:0"><input id="ci" placeholder="Ej: ¿cuánto sale el monitor?" style="flex:1;min-width:180px"><button>Enviar</button></form></aside></div>`;
  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{if(!user)return flash('Iniciá sesión o creá una cuenta para comprar.');const p=S.prods.find(x=>x.id==b.dataset.add),c=ccart.find(x=>x.id===p.id),n2=(c?c.qty:0)+1;if(n2>tot(p))return flash(`Stock insuficiente: hay ${tot(p)} unidades de ${p.name}.`);c?c.qty=n2:ccart.push({id:p.id,name:p.name,price:p.price,qty:1});flash(`${p.name} agregado al carrito.`,1);nav()});
+ document.querySelectorAll('[data-fc]').forEach(b=>b.onclick=()=>{fc=b.dataset.fc;vCat()});$('#so').onchange=e=>{so=e.target.value;vCat()};if(!user){$('#hv').onclick=()=>$('#cat0').scrollIntoView({behavior:'smooth'});$('#hr').onclick=()=>{tab='reg';render()}}
  $('#ho').onchange=e=>{hideOut=e.target.checked;vCat()};const qi=$('#q');qi.oninput=()=>{q=qi.value;const pos=qi.selectionStart;vCat();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
  const c=$('#chat');c.scrollTop=c.scrollHeight;
  $('#cf').onsubmit=e=>{e.preventDefault();const t=$('#ci').value.trim();if(!t)return;hist.push({t});hist.push({a:1,t:bot(t)});vCat()};
@@ -164,6 +175,7 @@ function vRep(){
   }
   o.innerHTML=`<div class="card">${h}<p class="mu">Generado en ${((performance.now()-t)/1000).toFixed(3)} s (meta: menos de 15 s).</p></div>`};
 }
+function openLogin(){const m=document.createElement('div');m.className='modal';m.id='mod';m.innerHTML=`<div class="card"><b>Ingresar</b><form id="lf" style="display:grid;gap:8px;margin-top:10px"><label class="mu">Usuario o email<input name="u" style="width:100%" autocomplete="username"></label><label class="mu">Clave<input name="p" type="password" style="width:100%" autocomplete="current-password"></label><button>Ingresar</button><button type="button" class="s" id="cx">Cancelar</button><span class="mu">Demo: vendedor/1234 o admin/1234</span></form></div>`;document.body.appendChild(m);$('#lf').onsubmit=window.doLogin;$('#cx').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};$('#lf').u.focus()}
 function vReg(){
  $('#view').innerHTML=`<div class="card" style="max-width:460px"><b>Crear cuenta de cliente</b><form id="rf" style="margin-top:10px;display:grid;gap:8px">
  <input name="n" placeholder="Nombre y apellido" autocomplete="name"><input name="e" type="email" placeholder="Email" autocomplete="email"><input name="t" placeholder="Teléfono (opcional)" autocomplete="tel">
@@ -201,6 +213,6 @@ function vMis(){
  const l=S.sales.filter(v=>v.cl&&v.cl===user.email).reverse();
  $('#view').innerHTML=`<div class="card tw"><b>Mis compras</b><table style="margin-top:8px"><tr><th>Fecha</th><th>Productos</th><th>Pago</th><th>Total</th></tr>${l.map(v=>`<tr><td>${new Date(v.d).toLocaleString('es-AR')}</td><td style="white-space:normal">${v.items.map(i=>esc(i.qty+' × '+i.name)).join('<br>')}</td><td>${esc(v.pay||'-')}</td><td>${money(v.t)}</td></tr>`).join('')||'<tr><td colspan="4" class="mu">Todavía no hiciste compras.</td></tr>'}</table></div>`;
 }
-function render(){pend=null;head();nav();({cat:vCat,sale:vSale,prod:vProd,dep:vDep,rep:vRep,reg:vReg,cli:vCli,cart:vCart,mis:vMis})[tab]()}
+function render(){pend=null;const mm=document.getElementById('mod');if(mm&&user)mm.remove();head();nav();({cat:vCat,sale:vSale,prod:vProd,dep:vDep,rep:vRep,reg:vReg,cli:vCli,cart:vCart,mis:vMis})[tab]()}
 render();
 </script></body></html>
