@@ -1,595 +1,206 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abelino Tapas — Carta Digital</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #F4EDD6;
-      --bg2: #EDE3C5;
-      --navy: #1C3D5A;
-      --navy2: #15304A;
-      --amber: #C8783A;
-      --amber-light: #E09558;
-      --sea: #3D7A6F;
-      --text: #1E2022;
-      --text-soft: #6B7280;
-      --white: #FFFDF7;
-      --border: rgba(28,61,90,0.13);
-      --shadow: 0 4px 24px rgba(28,61,90,0.12);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
-
-    /* HERO */
-    .hero {
-      background: var(--navy); color: var(--white);
-      text-align: center; padding: 56px 20px 72px;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse at 15% 60%, rgba(61,122,111,0.35) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 40%, rgba(200,120,58,0.25) 0%, transparent 55%);
-    }
-    .hero-inner { position: relative; z-index: 1; }
-    .hero-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--amber-light); margin-bottom: 10px; font-weight: 500; }
-    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 12vw, 88px); font-weight: 700; line-height: 0.92; letter-spacing: -1px; }
-    .hero-title em { font-style: italic; color: var(--amber-light); }
-    .hero-tagline { margin-top: 14px; font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 2.5px; text-transform: uppercase; }
-    .hero-wave { position: absolute; bottom: -1px; left: 0; right: 0; line-height: 0; }
-    .hero-wave svg { display: block; width: 100%; }
-
-    /* STICKY NAV */
-    .nav-sticky { position: sticky; top: 0; z-index: 100; background: var(--navy2); border-bottom: 2px solid var(--amber); overflow-x: auto; scrollbar-width: none; }
-    .nav-sticky::-webkit-scrollbar { display: none; }
-    .nav-inner { display: flex; padding: 0 16px; max-width: 960px; margin: 0 auto; white-space: nowrap; }
-    .nav-btn { background: none; border: none; border-bottom: 3px solid transparent; color: rgba(255,255,255,0.55); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 1.8px; text-transform: uppercase; padding: 13px 14px; cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
-    .nav-btn:hover { color: rgba(255,255,255,0.9); }
-    .nav-btn.active { color: var(--amber-light); border-bottom-color: var(--amber-light); }
-
-    /* MAIN */
-    .main { max-width: 960px; margin: 0 auto; padding: 0 20px 120px; }
-
-    /* SECTION */
-    .section { padding-top: 52px; scroll-margin-top: 50px; }
-    .section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; padding-bottom: 10px; border-bottom: 2px solid var(--navy); }
-    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 700; color: var(--navy); line-height: 1; }
-    .section-note { font-size: 11px; color: var(--text-soft); font-style: italic; }
-
-    /* MENU GRID */
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
-    .menu-card { background: var(--white); border-radius: 12px; padding: 15px 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
-    .menu-card:hover { border-color: rgba(200,120,58,0.5); box-shadow: 0 4px 20px rgba(28,61,90,0.1); transform: translateY(-1px); }
-    .card-info { flex: 1; min-width: 0; }
-    .card-name { font-size: 14px; font-weight: 500; line-height: 1.35; color: var(--text); }
-    .card-desc { font-size: 11px; color: var(--text-soft); margin-top: 3px; font-style: italic; line-height: 1.3; }
-    .card-type { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; margin-top: 4px; }
-    .type-tinto { color: #8B1A2E; }
-    .type-blanco { color: var(--sea); }
-    .type-espumante { color: #7B5EA7; }
-
-    /* ADD / QTY */
-    .add-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: white; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, transform 0.15s; line-height: 1; }
-    .add-btn:hover { background: var(--amber); transform: scale(1.1); }
-    .qty-ctl { display: none; align-items: center; gap: 7px; flex-shrink: 0; }
-    .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--amber); background: none; color: var(--amber); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1; }
-    .qty-btn:hover { background: var(--amber); color: white; }
-    .qty-n { font-weight: 700; font-size: 15px; color: var(--navy); min-width: 18px; text-align: center; }
-
-    /* WINE */
-    .wine-region-badge { display: inline-block; background: var(--navy); color: var(--amber-light); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; padding: 5px 12px; border-radius: 4px; margin: 10px 0 18px; }
-    .wine-bodega { margin-bottom: 22px; }
-    .wine-bodega-name { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 600; color: var(--navy); margin-bottom: 10px; }
-
-    /* CART FAB */
-    .cart-fab { position: fixed; bottom: 26px; right: 22px; background: var(--navy); color: white; border: none; border-radius: 50px; padding: 14px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(28,61,90,0.35); z-index: 200; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); transform: translateY(120px); opacity: 0; }
-    .cart-fab.visible { transform: translateY(0); opacity: 1; }
-    .cart-fab:hover { background: var(--amber); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(200,120,58,0.4); }
-    .cart-fab svg { width: 18px; height: 18px; }
-    .cart-badge { background: var(--amber); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-    .cart-fab:hover .cart-badge { background: white; color: var(--amber); }
-
-    /* OVERLAY — sin backdrop-filter para evitar lag */
-    .overlay { position: fixed; inset: 0; background: rgba(10,20,30,0.55); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    .overlay.open { opacity: 1; pointer-events: all; }
-
-    /* CART DRAWER */
-    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: var(--white); z-index: 400; transform: translateX(100%); transition: transform 0.36s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; box-shadow: -8px 0 48px rgba(0,0,0,0.18); }
-    .drawer.open { transform: translateX(0); }
-    .drawer-head { background: var(--navy); color: white; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .drawer-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; }
-    .drawer-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 26px; cursor: pointer; line-height: 1; padding: 4px; transition: color 0.2s; }
-    .drawer-close:hover { color: white; }
-    .drawer-body { flex: 1; overflow-y: auto; padding: 18px 22px; }
-    .empty-cart { text-align: center; padding: 64px 20px; color: var(--text-soft); }
-    .empty-cart-icon { font-size: 52px; margin-bottom: 14px; }
-    .empty-cart-msg { font-size: 15px; line-height: 1.5; }
-    .ci { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-    .ci-info { flex: 1; min-width: 0; }
-    .ci-name { font-size: 14px; font-weight: 500; }
-    .ci-sub { font-size: 11px; color: var(--text-soft); margin-top: 2px; font-style: italic; }
-    .ci-qty { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .cq-btn { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); background: none; color: var(--text); cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-    .cq-btn:hover { border-color: var(--amber); color: var(--amber); }
-    .cq-n { font-size: 14px; font-weight: 600; min-width: 18px; text-align: center; }
-    .notes-section { padding: 16px 0; }
-    .notes-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-soft); margin-bottom: 8px; }
-    .notes-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; resize: vertical; min-height: 72px; color: var(--text); background: var(--bg); transition: border-color 0.2s; }
-    .notes-input:focus { outline: none; border-color: var(--amber); }
-    .drawer-foot { padding: 14px 22px 22px; flex-shrink: 0; border-top: 2px solid var(--border); }
-    .cart-count-line { font-size: 12px; color: var(--text-soft); margin-bottom: 12px; text-align: center; }
-    .wa-btn { width: 100%; padding: 15px; background: #22C55E; color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
-    .wa-btn:hover { background: #16a34a; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(34,197,94,0.4); }
-    .wa-btn svg { width: 20px; height: 20px; }
-    .clear-btn { width: 100%; margin-top: 8px; padding: 9px; background: none; color: var(--text-soft); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-    .clear-btn:hover { border-color: #EF4444; color: #EF4444; }
-
-    /* TOAST */
-    .toast { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--navy); color: white; padding: 9px 18px; border-radius: 50px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.28s; white-space: nowrap; pointer-events: none; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* RESERVA FAB */
-    .reserva-fab { position: fixed; bottom: 84px; right: 22px; background: var(--sea); color: white; border: none; border-radius: 50px; padding: 11px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 24px rgba(61,122,111,0.4); z-index: 200; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .reserva-fab:hover { background: #2e6860; transform: translateY(-2px); box-shadow: 0 10px 32px rgba(61,122,111,0.5); }
-    .reserva-fab svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-    /* HERO RESERVA BTN */
-    .hero-reserva-btn { margin-top: 24px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.3); color: white; padding: 11px 22px; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
-    .hero-reserva-btn:hover { background: var(--amber); border-color: var(--amber); transform: translateY(-1px); }
-    .hero-reserva-btn svg { width: 15px; height: 15px; }
-
-    /* RESERVA MODAL */
-    .reserva-overlay { position: fixed; inset: 0; background: rgba(10,20,30,0.65); z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .reserva-overlay.open { opacity: 1; pointer-events: all; }
-    .reserva-modal { background: var(--white); border-radius: 20px; width: 100%; max-width: 460px; box-shadow: 0 24px 80px rgba(0,0,0,0.25); overflow: hidden; transform: scale(0.92) translateY(20px); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-    .reserva-overlay.open .reserva-modal { transform: scale(1) translateY(0); }
-    .reserva-modal-head { background: var(--navy); color: white; padding: 22px 24px 20px; display: flex; align-items: flex-start; justify-content: space-between; }
-    .reserva-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 700; line-height: 1.1; }
-    .reserva-modal-title span { color: var(--amber-light); font-style: italic; }
-    .reserva-modal-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 0.5px; }
-    .reserva-modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; transition: color 0.2s; }
-    .reserva-modal-close:hover { color: white; }
-    .reserva-modal-body { padding: 22px 24px; }
-    .reserva-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .reserva-field { margin-bottom: 14px; }
-    .reserva-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-soft); margin-bottom: 6px; }
-    .reserva-input, .reserva-select, .reserva-textarea { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); transition: border-color 0.2s, box-shadow 0.2s; appearance: none; -webkit-appearance: none; }
-    .reserva-input:focus, .reserva-select:focus, .reserva-textarea:focus { outline: none; border-color: var(--sea); box-shadow: 0 0 0 3px rgba(61,122,111,0.12); }
-    .reserva-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; cursor: pointer; }
-    .reserva-textarea { resize: vertical; min-height: 68px; line-height: 1.5; }
-    .reserva-modal-foot { padding: 0 24px 22px; }
-    .reserva-send-btn { width: 100%; padding: 14px; background: var(--sea); color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; box-shadow: 0 4px 16px rgba(61,122,111,0.3); }
-    .reserva-send-btn:hover { background: #2e6860; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(61,122,111,0.4); }
-    .reserva-send-btn svg { width: 18px; height: 18px; }
-
-    /* UBICACIÓN */
-    .ubicacion-wave-top { line-height: 0; }
-    .ubicacion-wave-top svg { display: block; width: 100%; }
-    .ubicacion-section { background: var(--navy); padding: 56px 20px 72px; position: relative; overflow: hidden; }
-    .ubicacion-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 10% 80%, rgba(61,122,111,0.3) 0%, transparent 50%), radial-gradient(ellipse at 90% 20%, rgba(200,120,58,0.2) 0%, transparent 50%); pointer-events: none; }
-    .ubicacion-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
-    .ubicacion-header { text-align: center; margin-bottom: 40px; }
-    .ubicacion-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--amber-light); margin-bottom: 10px; font-weight: 500; }
-    .ubicacion-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 8vw, 56px); font-weight: 700; color: var(--white); line-height: 1; }
-    .ubicacion-title em { font-style: italic; color: var(--amber-light); }
-    .ubicacion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-    .ubicacion-map { border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
-    .ubicacion-map iframe { display: block; width: 100%; height: 320px; border: none; }
-    .ubicacion-cards { display: flex; flex-direction: column; gap: 12px; }
-    .ubi-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px 20px; }
-    .ubi-card-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber-light); font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .ubi-card-label svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .ubi-card-value { font-size: 15px; color: var(--white); font-weight: 500; line-height: 1.5; }
-    .ubi-hours-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin-top: 4px; }
-    .ubi-day { font-size: 13px; color: rgba(255,255,255,0.5); }
-    .ubi-time { font-size: 13px; color: var(--white); }
-    .ubi-closed { font-size: 13px; color: rgba(255,255,255,0.28); font-style: italic; }
-    .ubi-gmaps-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 20px; background: var(--amber); color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 20px rgba(200,120,58,0.4); }
-    .ubi-gmaps-btn:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,120,58,0.5); }
-    .ubi-gmaps-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
-
-    /* FOOTER */
-    .site-footer { background: var(--navy2); color: rgba(255,255,255,0.5); text-align: center; padding: 28px 20px; font-size: 12px; letter-spacing: 0.5px; }
-    .site-footer strong { color: var(--amber-light); }
-
-    /* RESPONSIVE */
-    @media (max-width: 600px) {
-      .menu-grid { grid-template-columns: 1fr; }
-      .hero { padding: 40px 16px 56px; }
-      .section { padding-top: 38px; }
-      .reserva-row { grid-template-columns: 1fr; }
-      .reserva-fab { bottom: 84px; }
-      .ubicacion-grid { grid-template-columns: 1fr; }
-      .ubicacion-map iframe { height: 240px; }
-      .ubicacion-section { padding: 48px 16px 60px; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-inner">
-    <p class="hero-eyebrow">Carta Digital</p>
-    <h1 class="hero-title">Abelino <em>Tapas</em></h1>
-    <p class="hero-tagline">Playa Unión · Chubut</p>
-    <button class="hero-reserva-btn" onclick="openReserva()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Reservar Mesa
-    </button>
-  </div>
-  <div class="hero-wave">
-    <svg viewBox="0 0 1440 42" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,28 C360,0 1080,56 1440,14 L1440,42 L0,42 Z" fill="#F4EDD6"/>
-    </svg>
-  </div>
-</header>
-
-<!-- STICKY NAV -->
-<nav class="nav-sticky" id="nav">
-  <div class="nav-inner" id="navInner"></div>
-</nav>
-
-<!-- MAIN CONTENT -->
-<main class="main" id="menuMain"></main>
-
-<!-- WAVE INTO UBICACION -->
-<div class="ubicacion-wave-top">
-  <svg viewBox="0 0 1440 42" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-    <path d="M0,14 C360,56 1080,0 1440,28 L1440,0 L0,0 Z" fill="#F4EDD6"/>
-  </svg>
-</div>
-
-<!-- UBICACION -->
-<section class="ubicacion-section">
-  <div class="ubicacion-inner">
-    <div class="ubicacion-header">
-      <p class="ubicacion-eyebrow">Vení a visitarnos</p>
-      <h2 class="ubicacion-title">Dónde <em>encontrarnos</em></h2>
-    </div>
-    <div class="ubicacion-grid">
-      <div class="ubicacion-map">
-        <iframe
-          src="https://www.google.com/maps?q=-43.3093824,-65.03636019999999&z=16&output=embed"
-          allowfullscreen loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title="Ubicación Abelino Tapas">
-        </iframe>
-      </div>
-      <div class="ubicacion-cards">
-        <div class="ubi-card">
-          <div class="ubi-card-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Dirección
-          </div>
-          <div class="ubi-card-value">Av. Guillermo Rawson 1-148<br>Playa Unión, Chubut 9103</div>
-        </div>
-        <div class="ubi-card">
-          <div class="ubi-card-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Horarios
-          </div>
-          <div class="ubi-hours-grid">
-            <span class="ubi-day">Lunes</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-            <span class="ubi-day">Martes</span><span class="ubi-closed">Cerrado</span>
-            <span class="ubi-day">Miércoles</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-            <span class="ubi-day">Jueves</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-            <span class="ubi-day">Viernes</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-            <span class="ubi-day">Sábado</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-            <span class="ubi-day">Domingo</span><span class="ubi-time">12–15 hs · 19–24 hs</span>
-          </div>
-        </div>
-        <div class="ubi-card">
-          <div class="ubi-card-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Teléfono
-          </div>
-          <div class="ubi-card-value">280 453-6263</div>
-        </div>
-        <a class="ubi-gmaps-btn" href="https://maps.google.com/?cid=2625820002599995297" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          Abrir en Google Maps
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CART FAB -->
-<button class="cart-fab" id="cartFab" onclick="openCart()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-  Mi pedido
-  <span class="cart-badge" id="cartBadge">0</span>
-</button>
-
-<!-- OVERLAY -->
-<div class="overlay" id="overlay" onclick="closeCart()"></div>
-
-<!-- CART DRAWER -->
-<aside class="drawer" id="drawer">
-  <div class="drawer-head">
-    <span class="drawer-title">Mi Pedido 🛒</span>
-    <button class="drawer-close" onclick="closeCart()">✕</button>
-  </div>
-  <div class="drawer-body" id="drawerBody"></div>
-  <div class="drawer-foot">
-    <div class="cart-count-line" id="cartCountLine"></div>
-    <button class="wa-btn" onclick="sendToWhatsApp()">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-      Enviar pedido por WhatsApp
-    </button>
-    <button class="clear-btn" onclick="clearCart()">Vaciar carrito</button>
-  </div>
-</aside>
-
-<!-- RESERVA FAB -->
-<button class="reserva-fab" onclick="openReserva()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-  Reservar Mesa
-</button>
-
-<!-- RESERVA MODAL -->
-<div class="reserva-overlay" id="reservaOverlay" onclick="handleReservaOverlayClick(event)">
-  <div class="reserva-modal" id="reservaModal">
-    <div class="reserva-modal-head">
-      <div>
-        <div class="reserva-modal-title">Reservar <span>Mesa</span></div>
-        <div class="reserva-modal-sub">Te confirmamos por WhatsApp · Abelino Tapas</div>
-      </div>
-      <button class="reserva-modal-close" onclick="closeReserva()">✕</button>
-    </div>
-    <div class="reserva-modal-body">
-      <div class="reserva-field">
-        <label class="reserva-label">Nombre y Apellido</label>
-        <input class="reserva-input" id="rNombre" type="text" placeholder="Tu nombre completo" />
-      </div>
-      <div class="reserva-field">
-        <label class="reserva-label">Teléfono (opcional)</label>
-        <input class="reserva-input" id="rTelefono" type="tel" placeholder="Ej: 280 4xxxxxx" />
-      </div>
-      <div class="reserva-row">
-        <div class="reserva-field">
-          <label class="reserva-label">Fecha</label>
-          <input class="reserva-input" id="rFecha" type="date" />
-        </div>
-        <div class="reserva-field">
-          <label class="reserva-label">Hora</label>
-          <select class="reserva-select" id="rHora">
-            <option value="">Seleccioná</option>
-            <option>12:00</option><option>12:30</option>
-            <option>13:00</option><option>13:30</option>
-            <option>14:00</option><option>14:30</option>
-            <option>19:00</option><option>19:30</option>
-            <option>20:00</option><option>20:30</option>
-            <option>21:00</option><option>21:30</option>
-            <option>22:00</option>
-          </select>
-        </div>
-      </div>
-      <div class="reserva-field">
-        <label class="reserva-label">Cantidad de Personas</label>
-        <select class="reserva-select" id="rPersonas">
-          <option value="">Seleccioná</option>
-          <option>1 persona</option><option>2 personas</option>
-          <option>3 personas</option><option>4 personas</option>
-          <option>5 personas</option><option>6 personas</option>
-          <option>7 personas</option><option>8 personas</option>
-          <option>Más de 8 personas</option>
-        </select>
-      </div>
-      <div class="reserva-field" style="margin-bottom:0">
-        <label class="reserva-label">Notas adicionales (opcional)</label>
-        <textarea class="reserva-textarea" id="rNotas" placeholder="Ej: cumpleaños, mesa al aire libre, restricciones alimentarias..."></textarea>
-      </div>
-    </div>
-    <div class="reserva-modal-foot">
-      <button class="reserva-send-btn" onclick="sendReservaWhatsApp()">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-        Solicitar Reserva por WhatsApp
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <strong>Abelino Tapas</strong> · Playa Unión, Chubut · Reservas: 280 453-6263
-</footer>
-
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TecnoStock – Venta de equipos informáticos</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#1b2430;--mu:#5d6b7c;--bd:#d9e0ea;--ac:#2f6fed;--ac2:#e8f0ff;--ok:#1a8a4a;--wa:#b26a00;--er:#c62828;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151c;--card:#19212b;--tx:#e8edf3;--mu:#97a5b6;--bd:#2b3644;--ac:#6b9bff;--ac2:#1f2d49;--ok:#4cc27f;--wa:#e0a340;--er:#ff7b7b}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+h1{font-size:18px;margin:0}main{max-width:1180px;margin:0 auto;padding:16px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+button,input,select{font:inherit;color:var(--tx)}
+button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+button.s{background:var(--ac2);color:var(--ac)}button.d{background:transparent;color:var(--er);padding:4px 8px}
+nav button{background:var(--card);color:var(--tx);border:1px solid var(--bd)}nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+input,select{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px;max-width:100%}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.p{border:1px solid var(--bd);border-radius:10px;padding:12px;background:var(--card)}.p b{display:block}
+.pr{font-size:18px;font-weight:700;margin:6px 0}.mu{color:var(--mu);font-size:13px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--ac2);color:var(--ac)}.ok{color:var(--ok)}.wa{color:var(--wa)}.er{color:var(--er)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+#chat{height:340px;overflow-y:auto;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--bg)}
+.m{margin:6px 0;padding:7px 10px;border-radius:10px;max-width:85%}.u{background:var(--ac);color:#fff;margin-left:auto}.a{background:var(--card);border:1px solid var(--bd)}
+.msg{margin:8px 0;font-weight:600}
+input[type=checkbox]{padding:0;width:16px;height:16px;vertical-align:middle}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}.side{position:sticky;top:8px}
+@media(max-width:800px){.cols{grid-template-columns:1fr}.side{position:static}}
+</style></head><body>
+<header><h1>🖥️ TecnoStock</h1><div id="who"></div></header>
+<main><nav id="nav"></nav><div id="msg" class="msg" role="status"></div><div id="view"></div></main>
 <script>
-function openReserva() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('rFecha').min = today;
-  document.getElementById('reservaOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'$'+Number(n).toLocaleString('es-AR');
+const LOW=5, KEY='tecnostock_v2';
+const seed=()=>({deps:['Central','Sucursal'],prods:[
+ {id:1,name:'Notebook Lenovo IdeaPad 15',cat:'Notebooks',price:780000,st:{Central:8,Sucursal:3}},
+ {id:2,name:'Notebook HP 14 Ryzen 5',cat:'Notebooks',price:690000,st:{Central:4,Sucursal:2}},
+ {id:3,name:'Monitor Samsung 24 pulgadas',cat:'Monitores',price:210000,st:{Central:12,Sucursal:5}},
+ {id:4,name:'Teclado mecánico Redragon',cat:'Periféricos',price:48000,st:{Central:20,Sucursal:9}},
+ {id:5,name:'Mouse Logitech inalámbrico',cat:'Periféricos',price:26000,st:{Central:2,Sucursal:1}},
+ {id:6,name:'Disco SSD 1TB Kingston',cat:'Almacenamiento',price:95000,st:{Central:15,Sucursal:0}},
+ {id:7,name:'Memoria RAM 16GB DDR4',cat:'Componentes',price:62000,st:{Central:0,Sucursal:0}},
+ {id:8,name:'Impresora Epson EcoTank',cat:'Impresoras',price:340000,st:{Central:6,Sucursal:4}},
+ {id:9,name:'Notebook Asus Vivobook 15',cat:'Notebooks',price:720000,st:{Central:5,Sucursal:2}},
+ {id:10,name:'Monitor LG UltraGear 27 pulgadas',cat:'Monitores',price:385000,st:{Central:6,Sucursal:3}},
+ {id:11,name:'Monitor Philips 22 pulgadas',cat:'Monitores',price:150000,st:{Central:10,Sucursal:7}},
+ {id:12,name:'Auriculares HyperX Cloud Stinger',cat:'Periféricos',price:68000,st:{Central:9,Sucursal:4}},
+ {id:13,name:'Webcam Logitech C920',cat:'Periféricos',price:85000,st:{Central:1,Sucursal:0}},
+ {id:14,name:'Disco externo Seagate 2TB',cat:'Almacenamiento',price:110000,st:{Central:7,Sucursal:3}},
+ {id:15,name:'Pendrive Sandisk 128GB',cat:'Almacenamiento',price:14000,st:{Central:25,Sucursal:10}},
+ {id:16,name:'Placa de video GeForce RTX 4060',cat:'Componentes',price:620000,st:{Central:3,Sucursal:0}},
+ {id:17,name:'Fuente Corsair 650W',cat:'Componentes',price:89000,st:{Central:8,Sucursal:2}},
+ {id:18,name:'Impresora HP Laser 107w',cat:'Impresoras',price:230000,st:{Central:4,Sucursal:3}}],
+ sales:[],nid:19});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!S||!S.prods)S=seed();S.clients=S.clients||[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const tot=p=>Object.values(p.st).reduce((a,b)=>a+b,0);
+let ccart=[],pend=null,hideOut=false,user=null,tab='cat',cart=[],t0=0,hist=[{a:1,t:'Hola, soy el asistente de TecnoStock. Preguntame por precios, stock o categorías.'}],q='';
+const USERS={vendedor:{pw:'1234',role:'Vendedor'},admin:{pw:'1234',role:'Administrador'}};
+const flash=(t,ok)=>{const m=$('#msg');m.textContent=t;m.className='msg '+(ok?'ok':'er')};
+
+function head(){
+ $('#who').innerHTML=user?`<span class="mu">${esc(user.name?user.name+' · ':'')}${esc(user.role)}</span> <button class="s" id="lo">Salir</button>`:
+ `<form id="lf" class="row" style="margin:0"><input name="u" placeholder="usuario o email" size="12" autocomplete="username"><input name="p" type="password" placeholder="clave" size="7" autocomplete="current-password"><button>Ingresar</button><button type="button" class="s" id="rg">Crear cuenta</button></form>`;
+ if(!user)$('#rg').onclick=()=>{tab='reg';flash('');render()};
+ if(user)$('#lo').onclick=()=>{user=null;tab='cat';cart=[];ccart=[];flash('');render()};
+ else $('#lf').onsubmit=e=>{e.preventDefault();const f=e.target,k=f.u.value.trim().toLowerCase(),cl=S.clients.find(c=>c.email===k),u=USERS[k]||(cl&&{pw:cl.pw,role:'Cliente',name:cl.name,email:cl.email});
+  if(u&&u.pw===f.p.value){user=u;tab=u.role==='Vendedor'?'sale':u.role==='Cliente'?'cat':'prod';flash('Sesión iniciada como '+u.role,1)}
+  else flash('Usuario o clave incorrectos (demo: vendedor/1234 o admin/1234).');render()};
 }
-function closeReserva() {
-  document.getElementById('reservaOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+function nav(){
+ const t=[['cat','Catálogo']];
+ if(user&&user.role!=='Cliente')t.push(['sale','Registrar venta']);
+ if(user&&user.role==='Cliente')t.push(['cart','Carrito ('+ccart.reduce((a,c)=>a+c.qty,0)+')'],['mis','Mis compras']);
+ if(user&&user.role==='Administrador')t.push(['prod','Productos'],['dep','Depósitos'],['rep','Reportes'],['cli','Clientes']);
+ $('#nav').innerHTML=t.map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('');
+ $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;flash('');render()});
 }
-function handleReservaOverlayClick(e) {
-  if (e.target === document.getElementById('reservaOverlay')) closeReserva();
+const badge=p=>{const n=tot(p);return n===0?'<span class="er">Sin stock</span>':n<LOW?`<span class="wa">Últimas ${n} unidades</span>`:`<span class="ok">Disponible (${n})</span>`};
+
+function vCat(){
+ const l=S.prods.filter(p=>(p.name+' '+p.cat).toLowerCase().includes(q.toLowerCase())&&(!hideOut||tot(p)>0));
+ $('#view').innerHTML=`<div class="cols"><div class="card"><div class="row"><input id="q" placeholder="Buscar producto o categoría" value="${esc(q)}" style="flex:1;min-width:180px"><label class="mu"><input type="checkbox" id="ho" ${hideOut?'checked':''}> Ocultar sin stock</label></div>
+ <div class="grid">${l.map(p=>`<div class="p"><span class="tag">${esc(p.cat)}</span><b style="margin-top:6px">${esc(p.name)}</b><div class="pr">${money(p.price)}</div>${badge(p)}${(!user||user.role==='Cliente')&&tot(p)>0?`<div style="margin-top:8px"><button class="s" data-add="${p.id}">Agregar al carrito</button></div>`:''}</div>`).join('')||'<p class="mu">No hay productos que coincidan con la búsqueda.</p>'}</div></div>
+ <aside class="card side"><b>Asistente virtual</b><div id="chat">${hist.map(h=>`<div class="m ${h.a?'a':'u'}">${esc(h.t)}</div>`).join('')}</div>
+ <form id="cf" class="row" style="margin:0"><input id="ci" placeholder="Ej: ¿cuánto sale el monitor?" style="flex:1;min-width:180px"><button>Enviar</button></form></aside></div>`;
+ document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{if(!user)return flash('Iniciá sesión o creá una cuenta para comprar.');const p=S.prods.find(x=>x.id==b.dataset.add),c=ccart.find(x=>x.id===p.id),n2=(c?c.qty:0)+1;if(n2>tot(p))return flash(`Stock insuficiente: hay ${tot(p)} unidades de ${p.name}.`);c?c.qty=n2:ccart.push({id:p.id,name:p.name,price:p.price,qty:1});flash(`${p.name} agregado al carrito.`,1);nav()});
+ $('#ho').onchange=e=>{hideOut=e.target.checked;vCat()};const qi=$('#q');qi.oninput=()=>{q=qi.value;const pos=qi.selectionStart;vCat();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
+ const c=$('#chat');c.scrollTop=c.scrollHeight;
+ $('#cf').onsubmit=e=>{e.preventDefault();const t=$('#ci').value.trim();if(!t)return;hist.push({t});hist.push({a:1,t:bot(t)});vCat()};
 }
-function sendReservaWhatsApp() {
-  const nombre   = document.getElementById('rNombre').value.trim();
-  const telefono = document.getElementById('rTelefono').value.trim();
-  const fecha    = document.getElementById('rFecha').value;
-  const hora     = document.getElementById('rHora').value;
-  const personas = document.getElementById('rPersonas').value;
-  const notas    = document.getElementById('rNotas').value.trim();
-  if (!nombre)   { showToast('⚠️ Ingresá tu nombre'); return; }
-  if (!fecha)    { showToast('⚠️ Seleccioná una fecha'); return; }
-  if (!hora)     { showToast('⚠️ Seleccioná una hora'); return; }
-  if (!personas) { showToast('⚠️ Indicá la cantidad de personas'); return; }
-  const [y, m, d] = fecha.split('-');
-  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  const fechaStr = `${parseInt(d)} de ${months[parseInt(m)-1]} de ${y}`;
-  let msg = `📅 *Reserva de Mesa — Abelino Tapas*\n\n`;
-  msg += `👤 *Nombre:* ${nombre}\n`;
-  if (telefono) msg += `📞 *Teléfono:* ${telefono}\n`;
-  msg += `🗓️ *Fecha:* ${fechaStr}\n`;
-  msg += `🕐 *Hora:* ${hora} hs\n`;
-  msg += `👥 *Personas:* ${personas}\n`;
-  if (notas) msg += `\n💬 *Notas:* ${notas}\n`;
-  msg += `\n_Enviado desde la carta digital de Abelino Tapas_ 🌊`;
-  window.open(`https://wa.me/542804536263?text=${encodeURIComponent(msg)}`, '_blank');
-  closeReserva();
-  showToast('✓ Abriendo WhatsApp para confirmar reserva');
+function bot(t){
+ const s=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+ const w=s.split(/\W+/).filter(x=>x.length>2);
+ const sc=S.prods.map(p=>{const n=(p.name+' '+p.cat).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');return[p,w.filter(x=>n.includes(x)).length]}).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+ const ln=p=>`${p.name}: ${money(p.price)}, ${tot(p)>0?tot(p)+' unidades disponibles':'sin stock por el momento'}.`;
+ if(/barat|econom/.test(s)){const m=[...S.prods].filter(p=>tot(p)>0).sort((a,b)=>a.price-b.price)[0];return m?'El más económico con stock es: '+ln(m):'No tengo productos con stock.'}
+ if(sc.length){const top=sc.filter(x=>x[1]===sc[0][1]).slice(0,3).map(x=>x[0]);return top.map(ln).join(' ')}
+ if(/hola|buenas/.test(s))return '¡Hola! ¿Qué equipo estás buscando?';
+ return 'No tengo esa información en el catálogo. Probá con el nombre o la categoría de un producto.';
 }
 
-const MENU = [
-  { id:'empezar', label:'Para Empezar', emoji:'🦐', items:[
-    {id:'e1',name:'Papas Bravas'},{id:'e2',name:'Langostinos al Ajillo'},
-    {id:'e3',name:'Rabas o Chipirones',desc:'según estación'},
-    {id:'e4',name:'Tortilla de Papas o Verduras'},
-    {id:'e5',name:'Provoleta Rellena de Langostinos'},
-    {id:'e6',name:'Vieiras Gratinadas'},{id:'e7',name:'Bastoncitos de Pescado'},
-    {id:'e8',name:'Revuelto de Gramajo'},{id:'e9',name:'Chorizo a la Sidra'},
-    {id:'e10',name:'Bastoncitos de Muzarella'},{id:'e11',name:'Cornalitos Fritos'},
-  ]},
-  { id:'ensaladas', label:'Ensaladas', emoji:'🥗', items:[
-    {id:'en1',name:'Ensalada Abelino',desc:'lechuga, tomate, repollo, zanahoria, huevo, pollo, palta y queso'},
-    {id:'en2',name:'Ensalada Mixta',desc:'lechuga, repollo, zanahoria y tomate'},
-  ]},
-  { id:'pescados', label:'Pescados', emoji:'🐟', note:'Según disponibilidad', items:[
-    {id:'p1',name:'Merluza',desc:'al horno / frito / gratinado con romesco / con salsa roquefort · guarnición: papas fritas, puré o ensalada'},
-    {id:'p2',name:'Mero',desc:'al horno / frito / gratinado con romesco / con salsa roquefort · guarnición: papas fritas, puré o ensalada'},
-    {id:'p3',name:'Salmón',desc:'al horno / frito / gratinado con romesco / con salsa roquefort · guarnición: papas fritas, puré o ensalada'},
-  ]},
-  { id:'pastas', label:'Pastas', emoji:'🍝', note:'Según disponibilidad', items:[
-    {id:'pa1',name:'Sorrentinos',desc:'boloñesa / frutos de mar / queso / roquefort'},
-    {id:'pa2',name:'Ñoquis',desc:'boloñesa / frutos de mar / queso / roquefort'},
-    {id:'pa3',name:'Canelón de la Casa',desc:'boloñesa / frutos de mar / queso / roquefort'},
-    {id:'pa4',name:'Lasaña',desc:'boloñesa / frutos de mar / queso / roquefort'},
-  ]},
-  { id:'carnes', label:'Carnes', emoji:'🥩', items:[
-    {id:'c1',name:'Ojo de Bife con Salsa de Queso'},{id:'c2',name:'Chuletón de Vaca'},
-    {id:'c3',name:'Milanesa Napolitana'},{id:'c4',name:'Taquitos de Carne'},
-    {id:'c5',name:'Cerdo a la Parmesana'},{id:'c6',name:'Matambre de Cerdo a la Pizza'},
-    {id:'c7',name:'Brochette de Pollo o Carne'},
-  ]},
-  { id:'paraDos', label:'Para Dos', emoji:'🫂', items:[
-    {id:'d1',name:'Paella de Mariscos'},{id:'d2',name:'Parrillada de Mar'},
-    {id:'d3',name:'Mariscada'},{id:'d4',name:'Chupín de Pescado'},
-    {id:'d5',name:'Picadita Abelino'},{id:'d6',name:'Picadita Cervecera'},
-  ]},
-  { id:'minutas', label:'Minutas', emoji:'🍔', items:[
-    {id:'m1',name:'Hamburguesa Abelino'},{id:'m2',name:'Sándwich de Milanesa'},
-    {id:'m3',name:'Pizzeta de Jamón y Muzarella'},{id:'m4',name:'Pizzeta de Morrón y Huevo Duro'},
-    {id:'m5',name:'Pizzeta con Verduritas'},{id:'m6',name:'Pizzeta con Frutos de Mar'},
-  ]},
-  { id:'vinos', label:'Vinos', emoji:'🍷', wine:true, regions:[
-    { name:'Bodegas Patagónicas', bodegas:[
-      { name:'Bodega San Sebastian', items:[{id:'v1',name:'Fenomeno Malbec 750cc',type:'Tinto'},{id:'v2',name:'Fenomeno Malbec 375cc',type:'Tinto'},{id:'v3',name:'Lechuza Malbec',type:'Tinto'}]},
-      { name:'Bodega Tronelli', items:[{id:'v4',name:'Malbec Reserva',type:'Tinto'},{id:'v5',name:'Malbec Joven',type:'Tinto'},{id:'v6',name:'Torrontes',type:'Blanco'}]},
-      { name:'Bodega Agrestis', items:[{id:'v7',name:'Pinot Noir',type:'Tinto'},{id:'v8',name:'Agrestis Malbec',type:'Tinto'},{id:'v9',name:'Chardonnay',type:'Blanco'},{id:'v10',name:'Tenuis Gewurztraminer Extra Brut',type:'Espumante'}]},
-      { name:'Chacra Moschini', items:[{id:'v11',name:'Malbec',type:'Tinto'},{id:'v12',name:'Sauvignon Blanc',type:'Blanco'},{id:'v13',name:'Dulce Natural',type:'Blanco'}]},
-      { name:'Bodega Favretto', items:[{id:'v14',name:'Malbec',type:'Tinto'}]},
-      { name:'Bodega Puerta Oeste', items:[{id:'v15',name:'Malbec',type:'Tinto'}]},
-    ]},
-    { name:'Bodegas Mendocinas', bodegas:[
-      { name:'Bodega Melodia Wines', items:[{id:'v16',name:'Via Libre Malbec',type:'Tinto'},{id:'v17',name:'Via Libre Cabernet Sauvignon',type:'Tinto'},{id:'v18',name:'Dulce Espumante Torrontes',type:'Espumante'},{id:'v19',name:'Sauvignon Blanc',type:'Blanco'}]},
-    ]},
-  ]},
-  { id:'cocteleria', label:'Coctelería', emoji:'🍹', items:[
-    {id:'co1',name:'Gin con Pomelo'},{id:'co2',name:'Gin con Limón'},
-    {id:'co3',name:'Gin con Pepino y Limón'},{id:'co4',name:'Gin Especial'},
-    {id:'co5',name:'Gancia'},{id:'co6',name:'Gancia Batido'},{id:'co7',name:'Fernet'},
-    {id:'co8',name:'Campari'},{id:'co9',name:'Cachaça'},{id:'co10',name:'Cynar con Pomelo'},
-    {id:'co11',name:'Aperol'},{id:'co12',name:'Vodka con Naranja'},{id:'co13',name:'Vermut'},
-    {id:'co14',name:'Negroni'},{id:'co15',name:'Cuba Libre'},{id:'co16',name:'Pinta Artesanal'},
-    {id:'co17',name:'Cerveza Industrial'},{id:'co18',name:'Limonada',desc:'sin alcohol'},
-  ]},
-];
+function vSale(){
+ const av=S.prods.filter(p=>tot(p)>0);
+ const sum=cart.reduce((a,c)=>a+c.price*c.qty,0);
+ $('#view').innerHTML=`<div class="card"><b>Nueva venta</b><div class="row" style="margin-top:10px"><select id="sp">${av.map(p=>`<option value="${p.id}">${esc(p.name)} – ${money(p.price)} (${tot(p)})</option>`).join('')}</select>
+ <input id="sq" type="number" min="1" value="1" style="width:80px"><button id="ad" class="s">Agregar</button></div>
+ <div class="tw"><table><tr><th>Producto</th><th>Cant.</th><th>Subtotal</th><th></th></tr>${cart.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>${c.qty}</td><td>${money(c.price*c.qty)}</td><td><button class="d" data-i="${i}">Quitar</button></td></tr>`).join('')||'<tr><td colspan="4" class="mu">Sin productos seleccionados.</td></tr>'}</table></div>
+ <div class="row" style="margin-top:10px"><b>Total: ${money(sum)}</b><button id="cf">Confirmar venta</button></div></div>
+ <div class="card"><b>Últimas ventas</b><div class="tw"><table><tr><th>Fecha</th><th>Cliente</th><th>Ítems</th><th>Productos comprados</th><th>Total</th><th>Tiempo de registro</th></tr>${S.sales.slice(-10).reverse().map(v=>`<tr><td>${new Date(v.d).toLocaleString('es-AR')}</td><td>${v.cn?esc(v.cn)+' (web)':'Mostrador'}</td><td>${v.n}</td><td style="white-space:normal">${(v.items||[]).map(i=>esc(i.qty+' × '+i.name)).join('<br>')}</td><td>${money(v.t)}</td><td>${v.s!=null?v.s+' s':'-'}</td></tr>`).join('')||'<tr><td colspan="6" class="mu">Todavía no hay ventas.</td></tr>'}</table></div></div>`;
+ $('#ad').onclick=()=>{const p=S.prods.find(x=>x.id==$('#sp').value),qty=parseInt($('#sq').value);
+  if(!p||!(qty>0))return flash('Ingresá una cantidad válida.');
+  const already=(cart.find(c=>c.id===p.id)||{qty:0}).qty;
+  if(already+qty>tot(p))return flash(`Stock insuficiente: hay ${tot(p)} unidades de ${p.name}.`);
+  if(!cart.length)t0=performance.now();
+  const c=cart.find(c=>c.id===p.id);c?c.qty+=qty:cart.push({id:p.id,name:p.name,price:p.price,qty});flash('');vSale()};
+ document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{cart.splice(b.dataset.i,1);vSale()});
+ $('#cf').onclick=()=>{
+  if(!cart.length)return flash('Seleccioná al menos un producto para registrar la venta.');
+  for(const c of cart){const p=S.prods.find(x=>x.id===c.id);if(!p||c.qty>tot(p))return flash('Stock insuficiente para '+c.name+'. Venta rechazada.')}
+  for(const c of cart){const p=S.prods.find(x=>x.id===c.id);let r=c.qty;for(const d of S.deps){const k=Math.min(r,p.st[d]||0);p.st[d]=(p.st[d]||0)-k;r-=k}}
+  const s=((performance.now()-t0)/1000).toFixed(1);
+  S.sales.push({d:Date.now(),n:cart.reduce((a,c)=>a+c.qty,0),t:sum,s,items:cart.map(c=>({id:c.id,name:c.name,qty:c.qty,t:c.price*c.qty}))});
+  const low=cart.map(c=>S.prods.find(x=>x.id===c.id)).filter(p=>tot(p)<LOW).map(p=>p.name);
+  cart=[];save();vSale();flash('Venta registrada. Stock actualizado.'+(low.length?' ⚠ Stock bajo: '+low.join(', '):''),1)};
+}
 
-let cart = {};
-function cartCount() { return Object.values(cart).reduce((s,i) => s+i.qty, 0); }
-function addItem(id, name, desc) {
-  if (cart[id]) cart[id].qty++; else cart[id] = {name, qty:1, desc:desc||''};
-  syncItemUI(id); updateFab(); renderDrawer(); showToast('✓ '+name);
+function vProd(){
+ $('#view').innerHTML=`<div class="card"><b>Alta de producto</b><form id="pf" class="row" style="margin-top:10px"><input name="n" placeholder="Nombre"><input name="c" placeholder="Categoría"><input name="p" type="number" min="0" placeholder="Precio"><button>Guardar</button></form></div>
+ <div class="card tw"><label class="mu" style="display:block;margin-bottom:8px"><input type="checkbox" id="ho" ${hideOut?'checked':''}> Ocultar productos sin stock</label><table><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th></th></tr>${S.prods.filter(p=>!hideOut||tot(p)>0).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td><input type="number" min="0" value="${p.price}" data-p="${p.id}" style="width:110px"></td><td>${badge(p)}</td><td><button class="d" data-x="${p.id}">Eliminar</button></td></tr>`).join('')}</table></div>`;
+ $('#ho').onchange=e=>{hideOut=e.target.checked;vProd()};
+ $('#pf').onsubmit=e=>{e.preventDefault();const f=e.target,n=f.n.value.trim(),c=f.c.value.trim(),p=parseFloat(f.p.value);
+  const miss=[!n&&'nombre',!c&&'categoría',!(p>=0)&&'precio'].filter(Boolean);
+  if(miss.length)return flash('No se guardó. Faltan: '+miss.join(', ')+'.');
+  const st={};S.deps.forEach(d=>st[d]=0);S.prods.push({id:S.nid++,name:n,cat:c,price:p,st});save();flash('Producto guardado.',1);vProd()};
+ document.querySelectorAll('[data-p]').forEach(i=>i.onchange=()=>{const v=parseFloat(i.value);if(!(v>=0))return flash('Precio inválido.');S.prods.find(p=>p.id==i.dataset.p).price=v;save();flash('Precio actualizado.',1)});
+ document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{if(pend!=='p'+b.dataset.x){pend='p'+b.dataset.x;return flash('Tocá Eliminar otra vez para borrar el producto.')}pend=null;S.prods=S.prods.filter(p=>p.id!=b.dataset.x);save();flash('Producto eliminado.',1);vProd()});
 }
-function removeItem(id) {
-  if (!cart[id]) return;
-  cart[id].qty--;
-  if (cart[id].qty<=0) delete cart[id];
-  syncItemUI(id); updateFab(); renderDrawer();
+function vDep(){
+ $('#view').innerHTML=`<div class="card"><form id="df" class="row" style="margin:0"><input name="d" placeholder="Nuevo depósito"><button class="s">Agregar depósito</button></form></div>
+ <div class="card tw"><table><tr><th>Producto</th>${S.deps.map(d=>`<th>${esc(d)} <button class="d" data-rd="${esc(d)}" title="Eliminar depósito">✕</button></th>`).join('')}<th>Total</th></tr>${S.prods.map(p=>`<tr><td>${esc(p.name)}</td>${S.deps.map(d=>`<td><input type="number" value="${p.st[d]||0}" data-p="${p.id}" data-d="${esc(d)}" style="width:80px"></td>`).join('')}<td>${tot(p)}</td></tr>`).join('')}</table></div>`;
+ $('#df').onsubmit=e=>{e.preventDefault();const n=e.target.d.value.trim();if(!n||S.deps.includes(n))return flash('Nombre de depósito vacío o repetido.');S.deps.push(n);S.prods.forEach(p=>p.st[n]=0);save();vDep()};
+ document.querySelectorAll('[data-rd]').forEach(b=>b.onclick=()=>{const d=b.dataset.rd;if(S.deps.length<2)return flash('Tiene que quedar al menos un depósito.');const u=S.prods.reduce((a,p)=>a+(p.st[d]||0),0);if(pend!=='d'+d){pend='d'+d;return flash((u?`El depósito "${d}" tiene ${u} unidades que se van a perder. `:'')+`Tocá la ✕ otra vez para eliminar "${d}".`)}pend=null;S.deps=S.deps.filter(x=>x!==d);S.prods.forEach(p=>delete p.st[d]);save();flash('Depósito eliminado.',1);vDep()});
+ document.querySelectorAll('[data-d]').forEach(i=>i.onchange=()=>{const v=parseInt(i.value);const p=S.prods.find(x=>x.id==i.dataset.p);
+  if(!(v>=0)){i.value=p.st[i.dataset.d]||0;return flash('La cantidad debe ser mayor o igual a cero.')}
+  p.st[i.dataset.d]=v;save();flash('Stock guardado.',1);vDep()});
 }
-function syncItemUI(id) {
-  const qty = cart[id]?.qty||0;
-  const addBtn = document.querySelector(`.add-btn[data-id="${id}"]`);
-  const qtyCtl = document.querySelector(`.qty-ctl[data-id="${id}"]`);
-  if (!addBtn||!qtyCtl) return;
-  if (qty>0) { addBtn.style.display='none'; qtyCtl.style.display='flex'; qtyCtl.querySelector('.qty-n').textContent=qty; }
-  else { addBtn.style.display='flex'; qtyCtl.style.display='none'; }
+function vRep(){
+ $('#view').innerHTML=`<div class="card"><div class="row" style="margin:0"><select id="rt"><option value="v">Reporte de ventas</option><option value="i">Reporte de inventario</option></select><button id="rg">Generar</button></div></div><div id="ro"></div>`;
+ $('#rg').onclick=()=>{const t=performance.now(),o=$('#ro');let h='';
+  if($('#rt').value==='v'){
+   if(!S.sales.length){o.innerHTML='<div class="card mu">No hay ventas registradas para generar el reporte.</div>';return}
+   const by={};S.sales.forEach(v=>v.items.forEach(i=>{by[i.name]=by[i.name]||{q:0,t:0};by[i.name].q+=i.qty;by[i.name].t+=i.t}));
+   const total=S.sales.reduce((a,v)=>a+v.t,0);
+   h=`<p><b>${S.sales.length}</b> ventas · Total <b>${money(total)}</b></p><div class="tw"><table><tr><th>Producto</th><th>Unidades</th><th>Monto</th></tr>${Object.entries(by).sort((a,b)=>b[1].t-a[1].t).map(([n,x])=>`<tr><td>${esc(n)}</td><td>${x.q}</td><td>${money(x.t)}</td></tr>`).join('')}</table></div>`;
+  }else{
+   const val=S.prods.reduce((a,p)=>a+p.price*tot(p),0),low=S.prods.filter(p=>tot(p)<LOW);
+   h=`<p>Valor del inventario: <b>${money(val)}</b></p><p><b>Productos con stock bajo (menos de ${LOW}):</b></p><div class="tw"><table><tr><th>Producto</th><th>Stock</th></tr>${low.map(p=>`<tr><td>${esc(p.name)}</td><td>${tot(p)}</td></tr>`).join('')||'<tr><td colspan="2">Ninguno.</td></tr>'}</table></div>`;
+  }
+  o.innerHTML=`<div class="card">${h}<p class="mu">Generado en ${((performance.now()-t)/1000).toFixed(3)} s (meta: menos de 15 s).</p></div>`};
 }
-function updateFab() {
-  const n=cartCount();
-  document.getElementById('cartBadge').textContent=n;
-  document.getElementById('cartFab').classList.toggle('visible',n>0);
+function vReg(){
+ $('#view').innerHTML=`<div class="card" style="max-width:460px"><b>Crear cuenta de cliente</b><form id="rf" style="margin-top:10px;display:grid;gap:8px">
+ <input name="n" placeholder="Nombre y apellido" autocomplete="name"><input name="e" type="email" placeholder="Email" autocomplete="email"><input name="t" placeholder="Teléfono (opcional)" autocomplete="tel">
+ <input name="p" type="password" placeholder="Clave (mínimo 6 caracteres)" autocomplete="new-password"><input name="p2" type="password" placeholder="Repetir clave" autocomplete="new-password">
+ <button>Registrarme</button><span class="mu">Es una demo: no uses una clave real.</span></form></div>`;
+ $('#rf').onsubmit=e=>{e.preventDefault();const f=e.target,n=f.n.value.trim(),em=f.e.value.trim().toLowerCase(),t=f.t.value.trim();
+  if(!n||!em||!f.p.value)return flash('Completá nombre, email y clave.');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return flash('El email no es válido.');
+  if(S.clients.some(c=>c.email===em))return flash('Ya existe una cuenta con ese email.');
+  if(f.p.value.length<6)return flash('La clave debe tener al menos 6 caracteres.');
+  if(f.p.value!==f.p2.value)return flash('Las claves no coinciden.');
+  S.clients.push({id:Date.now(),name:n,email:em,phone:t,pw:f.p.value,d:Date.now()});save();
+  user={role:'Cliente',name:n,email:em,pw:f.p.value};tab='cat';render();flash('Cuenta creada. Ya iniciaste sesión como '+n+'.',1)};
 }
-function openCart() { renderDrawer(); document.getElementById('drawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
-function closeCart() { document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
-function renderDrawer() {
-  const body=document.getElementById('drawerBody');
-  const entries=Object.entries(cart);
-  const count=cartCount();
-  document.getElementById('cartCountLine').textContent=count>0?`${count} producto${count!==1?'s':''} en tu pedido`:'';
-  if (!entries.length) { body.innerHTML=`<div class="empty-cart"><div class="empty-cart-icon">🍽️</div><div class="empty-cart-msg">Tu carrito está vacío.<br>¡Agregá algo rico de la carta!</div></div>`; return; }
-  let html='';
-  entries.forEach(([id,item]) => {
-    const sn=item.name.replace(/'/g,"\\'"); const sd=item.desc.replace(/'/g,"\\'");
-    html+=`<div class="ci"><div class="ci-info"><div class="ci-name">${item.name}</div>${item.desc?`<div class="ci-sub">${item.desc}</div>`:''}</div><div class="ci-qty"><button class="cq-btn" onclick="removeItem('${id}')">−</button><span class="cq-n">${item.qty}</span><button class="cq-btn" onclick="addItem('${id}','${sn}','${sd}')">+</button></div></div>`;
-  });
-  html+=`<div class="notes-section"><div class="notes-label">Notas / Aclaraciones</div><textarea class="notes-input" id="cartNotes" placeholder="Ej: sin cebolla, sin gluten, preparación del pescado, salsa de la pasta, mesa afuera..."></textarea></div>`;
-  body.innerHTML=html;
+function vCli(){
+ $('#view').innerHTML=`<div class="card tw"><b>Clientes registrados (${S.clients.length})</b><table style="margin-top:8px"><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Alta</th><th></th></tr>${S.clients.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone||'-')}</td><td>${new Date(c.d).toLocaleDateString('es-AR')}</td><td><button class="d" data-c="${c.id}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="5" class="mu">Todavía no hay clientes registrados.</td></tr>'}</table></div>`;
+ document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{if(pend!=='c'+b.dataset.c){pend='c'+b.dataset.c;return flash('Tocá Eliminar otra vez para borrar el cliente.')}pend=null;S.clients=S.clients.filter(c=>c.id!=b.dataset.c);save();flash('Cliente eliminado.',1);vCli()});
 }
-function clearCart() { cart={}; document.querySelectorAll('.add-btn').forEach(b=>b.style.display='flex'); document.querySelectorAll('.qty-ctl').forEach(e=>e.style.display='none'); updateFab(); renderDrawer(); showToast('🗑️ Carrito vaciado'); }
-function sendToWhatsApp() {
-  const entries=Object.entries(cart);
-  if (!entries.length) { showToast('Agregá algo al carrito primero'); return; }
-  let msg='🦞 *Pedido — Abelino Tapas*\n\n📋 *Detalle:*\n';
-  entries.forEach(([,item]) => { msg+=`• ${item.name} ×${item.qty}\n`; if (item.desc&&item.desc.includes('/')) msg+=`  _(indicar preparación/salsa al confirmar)_\n`; });
-  const notes=document.getElementById('cartNotes')?.value?.trim();
-  if (notes) msg+=`\n💬 *Notas:* ${notes}`;
-  msg+='\n\n_Enviado desde la carta digital de Abelino Tapas_ 🌊';
-  window.open(`https://wa.me/542804536263?text=${encodeURIComponent(msg)}`,'_blank');
+function vCart(){
+ const sum=ccart.reduce((a,c)=>a+c.price*c.qty,0);
+ $('#view').innerHTML=`<div class="card"><b>Tu carrito</b><div class="tw"><table style="margin-top:8px"><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr>${ccart.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>${money(c.price)}</td><td><button class="s" data-m="${i}">−</button> ${c.qty} <button class="s" data-pl="${i}">+</button></td><td>${money(c.price*c.qty)}</td><td><button class="d" data-r="${i}">Quitar</button></td></tr>`).join('')||'<tr><td colspan="5" class="mu">El carrito está vacío. Agregá productos desde el catálogo.</td></tr>'}</table></div>
+ <div class="row" style="margin-top:10px"><b>Total: ${money(sum)}</b><select id="pm"><option>Tarjeta</option><option>Transferencia</option><option>Efectivo al retirar</option></select><button id="fin">Finalizar compra</button></div><p class="mu">El pago es simulado: no se cobra nada.</p></div>`;
+ const maxq=i=>tot(S.prods.find(p=>p.id===ccart[i].id)||{st:{}});
+ document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const c=ccart[b.dataset.m];c.qty--;if(c.qty<1)ccart.splice(b.dataset.m,1);nav();vCart()});
+ document.querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>{const i=b.dataset.pl;if(ccart[i].qty+1>maxq(i))return flash('No hay más stock de '+ccart[i].name+'.');ccart[i].qty++;nav();vCart()});
+ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ccart.splice(b.dataset.r,1);nav();vCart()});
+ $('#fin').onclick=()=>{
+  if(!ccart.length)return flash('Tu carrito está vacío.');
+  for(const c of ccart){const p=S.prods.find(x=>x.id===c.id);if(!p||c.qty>tot(p))return flash('Stock insuficiente para '+c.name+'. Ajustá la cantidad.')}
+  for(const c of ccart){const p=S.prods.find(x=>x.id===c.id);let r=c.qty;for(const d of S.deps){const k=Math.min(r,p.st[d]||0);p.st[d]=(p.st[d]||0)-k;r-=k}}
+  S.sales.push({d:Date.now(),n:ccart.reduce((a,c)=>a+c.qty,0),t:sum,s:null,cl:user.email,cn:user.name,pay:$('#pm').value,items:ccart.map(c=>({id:c.id,name:c.name,qty:c.qty,t:c.price*c.qty}))});
+  ccart=[];save();tab='mis';render();flash('¡Compra realizada! Gracias, '+user.name+'.',1)};
 }
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
-
-function itemCard(item) {
-  const desc=item.desc||''; const typeClass=item.type==='Tinto'?'type-tinto':item.type==='Blanco'?'type-blanco':item.type==='Espumante'?'type-espumante':'';
-  const sn=item.name.replace(/'/g,"\\'"); const sd=desc.replace(/'/g,"\\'");
-  return `<div class="menu-card"><div class="card-info"><div class="card-name">${item.name}</div>${desc?`<div class="card-desc">${desc}</div>`:''}${item.type?`<div class="card-type ${typeClass}">${item.type}</div>`:''}</div><button class="add-btn" data-id="${item.id}" onclick="addItem('${item.id}','${sn}','${sd}')">+</button><div class="qty-ctl" data-id="${item.id}"><button class="qty-btn" onclick="removeItem('${item.id}')">−</button><span class="qty-n">1</span><button class="qty-btn" onclick="addItem('${item.id}','${sn}','${sd}')">+</button></div></div>`;
+function vMis(){
+ const l=S.sales.filter(v=>v.cl&&v.cl===user.email).reverse();
+ $('#view').innerHTML=`<div class="card tw"><b>Mis compras</b><table style="margin-top:8px"><tr><th>Fecha</th><th>Productos</th><th>Pago</th><th>Total</th></tr>${l.map(v=>`<tr><td>${new Date(v.d).toLocaleString('es-AR')}</td><td style="white-space:normal">${v.items.map(i=>esc(i.qty+' × '+i.name)).join('<br>')}</td><td>${esc(v.pay||'-')}</td><td>${money(v.t)}</td></tr>`).join('')||'<tr><td colspan="4" class="mu">Todavía no hiciste compras.</td></tr>'}</table></div>`;
 }
-function renderMenu() {
-  document.getElementById('navInner').innerHTML=MENU.map(s=>`<button class="nav-btn" data-target="${s.id}" onclick="scrollToSection('${s.id}')">${s.emoji} ${s.label}</button>`).join('');
-  document.getElementById('menuMain').innerHTML=MENU.map(section=>{
-    let inner='';
-    if (section.wine) { inner=section.regions.map(r=>`<div class="wine-region-badge">${r.name}</div>${r.bodegas.map(b=>`<div class="wine-bodega"><div class="wine-bodega-name">${b.name}</div><div class="menu-grid">${b.items.map(itemCard).join('')}</div></div>`).join('')}`).join(''); }
-    else { inner=`<div class="menu-grid">${section.items.map(itemCard).join('')}</div>`; }
-    return `<section class="section" id="${section.id}" data-id="${section.id}"><div class="section-head"><h2 class="section-title">${section.emoji} ${section.label}</h2>${section.note?`<span class="section-note">${section.note}</span>`:''}</div>${inner}</section>`;
-  }).join('');
-}
-function scrollToSection(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); }
-function initObserver() {
-  const sections=document.querySelectorAll('.section[data-id]');
-  const btns=document.querySelectorAll('.nav-btn');
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if (e.isIntersecting) { const id=e.target.dataset.id; btns.forEach(b=>b.classList.toggle('active',b.dataset.target===id)); document.querySelector(`.nav-btn[data-target="${id}"]`)?.scrollIntoView({inline:'nearest',block:'nearest'}); }});
-  },{threshold:0.15,rootMargin:'-55px 0px -45% 0px'});
-  sections.forEach(s=>obs.observe(s));
-}
-renderMenu();
-initObserver();
-</script>
-</body>
-</html>
+function render(){pend=null;head();nav();({cat:vCat,sale:vSale,prod:vProd,dep:vDep,rep:vRep,reg:vReg,cli:vCli,cart:vCart,mis:vMis})[tab]()}
+render();
+</script></body></html>
